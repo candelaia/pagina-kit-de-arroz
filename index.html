@@ -2459,7 +2459,6 @@
       z-index: 9998;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
       box-shadow: var(--chat-shadow);
       transform: translateY(20px) scale(0.9);
       opacity: 0;
@@ -2826,7 +2825,7 @@
     </div>
 
     <!-- Settings/Training Panel -->
-    <div id="training-panel" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:var(--chat-dark,#1A1208); z-index:100; padding:25px; overflow-y:auto; font-family:'Jost',sans-serif;">
+    <div id="training-panel" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0; background:#1A1208; z-index:200; padding:25px; overflow-y:auto; font-family:'Jost',sans-serif; border-radius:24px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h3 style="color:#C9A84C; font-family:'Cormorant Garamond',serif; margin:0; font-size:20px;">⚙️ Configuración IA</h3>
         <button onclick="chatbot.toggleTraining()" style="background:none; border:none; color:rgba(250,246,238,0.6); cursor:pointer; font-size:20px;">✕</button>
@@ -2835,7 +2834,7 @@
       <div style="margin-bottom:16px;">
         <label style="display:block; font-size:11px; color:rgba(250,246,238,0.7); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">🔑 API Key</label>
         <input type="text" id="api-key-input" placeholder="sk-or-... o tu JWT token" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.2); border-radius:10px; color:#fff; font-family:inherit; font-size:12px;">
-        <p style="font-size:10px; color:rgba(250,246,238,0.4); margin-top:4px;">OpenRouter (sk-or-...) | Gemini (AIza...) | Servidor propio (JWT u otro)</p>
+        <p style="font-size:10px; color:rgba(250,246,238,0.4); margin-top:4px;">OpenRouter (sk-or-...) | Groq (gsk_...) | Gemini (AIza...) | Otro = servidor propio</p>
       </div>
 
       <div style="margin-bottom:16px;">
@@ -2913,15 +2912,23 @@
       }
 
       /**
-       * Detecta automáticamente el proveedor de IA según la API Key:
-       * - 'openrouter' → keys que empiezan con 'sk-or-'
-       * - 'gemini'     → keys que empiezan con 'AIza'
-       * - 'custom'     → todo lo demás (JWT, tokens de servidor propio, etc.)
+       * Detecta el proveedor de IA según la API Key:
+       * - 'openrouter' → sk-or-...
+       * - 'groq'       → gsk_...
+       * - 'gemini'     → AIza...
+       * - 'custom'     → JWT, tokens propios, o cualquier otro
        */
       detectProvider() {
-        if (this.apiKey.startsWith('sk-or-')) return 'openrouter';
-        if (this.apiKey.startsWith('AIza')) return 'gemini';
+        const k = this.apiKey;
+        if (k.startsWith('sk-or-')) return 'openrouter';
+        if (k.startsWith('gsk_')) return 'groq';
+        if (k.startsWith('AIza')) return 'gemini';
         return 'custom';
+      }
+
+      getProviderLabel(p) {
+        const labels = { openrouter: 'OpenRouter', groq: 'Groq', gemini: 'Google Gemini', custom: 'Servidor personalizado' };
+        return labels[p] || p;
       }
 
       initSpeech() {
@@ -3005,7 +3012,7 @@
         
         this.toggleTraining();
         const provider = this.detectProvider();
-        this.addMessage(`✅ Configuración guardada. Proveedor detectado: ${provider === 'openrouter' ? 'OpenRouter' : provider === 'gemini' ? 'Google Gemini' : 'Servidor personalizado'}`, 'assistant');
+        this.addMessage(`✅ Guardado. Proveedor: ${this.getProviderLabel(provider)}. Escribe algo para probar.`, 'assistant');
       }
 
       addMessage(text, sender) {
@@ -3031,7 +3038,7 @@
         if (!this.apiKey) {
           this.addMessage(text, 'user');
           input.value = '';
-          this.addMessage('⚠️ Configura tu API Key primero. Abre el panel de ajustes (icono ⚙️ en el header del chat).', 'assistant');
+          this.addMessage('⚠️ Configura tu API Key primero. Haz clic en ⚙️ arriba.', 'assistant');
           return;
         }
 
@@ -3046,106 +3053,115 @@
         } catch (error) {
           console.error('❌ Chatbot Error:', error);
           this.showTyping(false);
-          this.addMessage('Error: ' + error.message, 'assistant');
+          this.addMessage('❌ ' + error.message, 'assistant');
         }
       }
 
       async callAI(prompt) {
-        const systemInstruction = `TÚ ERES: ${this.agentName}. Un experto de alto nivel en dermatología y embajador de Candela Prime.
-        
-        TU PROPÓSITO: ${this.purpose || 'Ayudar a los clientes con información sobre el Kit Bioaqua Rice Raw Pulp y guiarlos hacia la compra.'}
-        
-        REGLAS DE ORO: ${this.goldenRules || 'Sé amable, profesional y persuasiva. Siempre recomienda el kit.'}
-
-        RESTRICCIONES: ${this.negativeRules || 'No inventes información médica. No hables de la competencia.'}
-
-        LINKS AUTORIZADOS: ${this.links || 'checkout.html para comprar'}
-
-        CONOCIMIENTO ESPECÍFICO: ${this.extraTraining}
-
-        CONTEXTO DE LA PÁGINA: ${this.context}
-        
-        INSTRUCCIÓN: Responde en español, profesional y concisa (máximo 3 párrafos).`;
+        const sysMsg = `Eres ${this.agentName}, experto en dermatología y embajador de Candela Prime.
+Propósito: ${this.purpose || 'Ayudar con información sobre el Kit Bioaqua Rice Raw Pulp y guiar hacia la compra.'}
+Reglas: ${this.goldenRules || 'Sé amable, profesional y persuasiva.'}
+Restricciones: ${this.negativeRules || 'No inventes información médica.'}
+Links: ${this.links || 'checkout.html para comprar'}
+Entrenamiento: ${this.extraTraining}
+Contexto web: ${this.context}
+Responde SIEMPRE en español, máximo 3 párrafos, profesional y persuasiva.`;
 
         const provider = this.detectProvider();
         let url, headers, body;
 
-        if (provider === 'openrouter') {
-          // ═══ OPENROUTER ═══
-          url = 'https://openrouter.ai/api/v1/chat/completions';
-          headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.apiKey}`,
-            'HTTP-Referer': window.location.origin || window.location.href,
-            'X-Title': 'Candela Prime AI'
-          };
-          body = {
-            model: this.apiModel || 'google/gemma-3-27b-it:free',
-            messages: [
-              { role: 'system', content: systemInstruction },
-              { role: 'user', content: prompt }
-            ],
-            max_tokens: 500
-          };
-        } else if (provider === 'gemini') {
-          // ═══ GOOGLE GEMINI ═══
-          const model = this.apiModel || 'gemini-2.0-flash';
-          url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.apiKey}`;
-          headers = { 'Content-Type': 'application/json' };
-          body = {
-            contents: [{ parts: [{ text: systemInstruction + '\n\nUSUARIO: ' + prompt }] }]
-          };
-        } else {
-          // ═══ SERVIDOR PERSONALIZADO (JWT, tokens propios, etc.) ═══
-          // Usa formato OpenAI-compatible (el estándar para la mayoría de servidores)
-          const baseUrl = this.apiUrl || 'https://openrouter.ai/api/v1';
-          url = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
-          headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.apiKey}`
-          };
-          body = {
-            model: this.apiModel || 'google/gemma-3-27b-it:free',
-            messages: [
-              { role: 'system', content: systemInstruction },
-              { role: 'user', content: prompt }
-            ],
-            max_tokens: 500
-          };
+        // ═══════════════════════════════════════
+        // CONFIGURACIÓN POR PROVEEDOR
+        // ═══════════════════════════════════════
+        switch (provider) {
+          case 'openrouter':
+            url = 'https://openrouter.ai/api/v1/chat/completions';
+            headers = {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + this.apiKey,
+              'HTTP-Referer': window.location.origin,
+              'X-Title': 'Candela Prime'
+            };
+            body = {
+              model: this.apiModel || 'google/gemma-3-27b-it:free',
+              messages: [{ role: 'system', content: sysMsg }, { role: 'user', content: prompt }],
+              max_tokens: 500
+            };
+            break;
+
+          case 'groq':
+            url = 'https://api.groq.com/openai/v1/chat/completions';
+            headers = {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + this.apiKey
+            };
+            body = {
+              model: this.apiModel || 'llama-3.3-70b-versatile',
+              messages: [{ role: 'system', content: sysMsg }, { role: 'user', content: prompt }],
+              max_tokens: 500
+            };
+            break;
+
+          case 'gemini':
+            const gemModel = this.apiModel || 'gemini-2.0-flash';
+            url = 'https://generativelanguage.googleapis.com/v1beta/models/' + gemModel + ':generateContent?key=' + this.apiKey;
+            headers = { 'Content-Type': 'application/json' };
+            body = {
+              contents: [{ parts: [{ text: sysMsg + '\n\nUsuario: ' + prompt }] }]
+            };
+            break;
+
+          default: // custom
+            if (!this.apiUrl) {
+              throw new Error('Para servidor personalizado, debes poner la URL en ⚙️ Configuración.');
+            }
+            url = this.apiUrl.endsWith('/chat/completions') ? this.apiUrl : this.apiUrl + '/chat/completions';
+            headers = {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + this.apiKey
+            };
+            body = {
+              model: this.apiModel || 'default',
+              messages: [{ role: 'system', content: sysMsg }, { role: 'user', content: prompt }],
+              max_tokens: 500
+            };
         }
 
-        console.log(`🤖 [${provider.toUpperCase()}] → ${url}`);
-        console.log('📦 Model:', body.model || 'default');
+        console.log('🤖 Provider:', provider, '| URL:', url, '| Model:', body.model || 'n/a');
 
-        const response = await fetch(url, {
+        const resp = await fetch(url, {
           method: 'POST',
           headers: headers,
           body: JSON.stringify(body)
         });
 
-        if (!response.ok) {
-          const errText = await response.text();
-          console.error('❌ API Error:', response.status, errText);
-          throw new Error(`API respondió ${response.status}. Verifica tu API Key y URL.`);
+        if (!resp.ok) {
+          const errBody = await resp.text();
+          console.error('❌ HTTP', resp.status, errBody);
+          
+          if (resp.status === 401) throw new Error('API Key inválida o expirada. Verifica en ⚙️.');
+          if (resp.status === 403) throw new Error('Acceso denegado. La key no tiene permisos.');
+          if (resp.status === 429) throw new Error('Límite de uso alcanzado. Espera un momento.');
+          if (resp.status === 404) throw new Error('Modelo o URL no encontrado. Verifica en ⚙️.');
+          throw new Error('Error ' + resp.status + ': ' + resp.statusText);
         }
 
-        const data = await response.json();
-        console.log('✅ Respuesta:', data);
+        const data = await resp.json();
+        console.log('✅ Response:', data);
 
-        // Intentar formato OpenAI (OpenRouter, servidores custom)
-        const openaiContent = data?.choices?.[0]?.message?.content;
-        if (openaiContent) return openaiContent;
-
-        // Intentar formato Gemini
-        const geminiContent = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (geminiContent) return geminiContent;
-
-        // Si hay error en la respuesta
+        // Formato OpenAI (OpenRouter, Groq, Custom)
+        if (data?.choices?.[0]?.message?.content) {
+          return data.choices[0].message.content;
+        }
+        // Formato Gemini
+        if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          return data.candidates[0].content.parts[0].text;
+        }
+        // Error en respuesta
         if (data?.error) {
           throw new Error(data.error.message || JSON.stringify(data.error));
         }
-
-        throw new Error('Formato de respuesta no reconocido. Revisa la consola (F12).');
+        throw new Error('Respuesta no reconocida. Revisa la consola (F12).');
       }
     }
 
