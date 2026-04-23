@@ -5,39 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finalizar Pedido | Ritual Ancestral de Arroz</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <!-- Step 1: Inicializar el script de Bold (Dinámico para mayor rendimiento) -->
+    <!-- Bold Checkout - URL CORRECTA de Bold Colombia -->
+    <script src="https://checkout.bold.co/library/boldPaymentButton.js"></script>
     <script>
       /**
-       * Bold Integration Service - Senior Implementation
-       * Maneja la carga asíncrona y la seguridad de la pasarela
+       * Bold Integration Service
+       * Genera la firma de integridad SHA-256 para validar transacciones
        */
       const BoldService = {
-        scriptUrl: 'https://checkout.bold.co/library/v0/checkout.js',
-        isLoaded: false,
-
-        loadScript: function() {
-          return new Promise((resolve, reject) => {
-            if (window.BoldCheckout) {
-              this.isLoaded = true;
-              return resolve();
-            }
-
-            const script = document.createElement('script');
-            script.src = this.scriptUrl;
-            script.async = true;
-            script.onload = () => {
-              this.isLoaded = true;
-              console.log('✅ Bold Library Loaded');
-              resolve();
-            };
-            script.onerror = () => reject(new Error('No se pudo cargar la librería de Bold. Verifique su conexión o CSP.'));
-            document.head.appendChild(script);
-          });
-        },
-
         generateSignature: async function(orderId, amount, currency, secret) {
-          if (!secret || secret === '8WHXiTUKPucrCirwEc3nFg') return null; // No firmar si es la llave por defecto
-          
           const msg = `${orderId}${amount}${currency}${secret}`;
           const encoder = new TextEncoder();
           const data = encoder.encode(msg);
@@ -46,11 +22,6 @@
           return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
       };
-
-      // Inicialización preventiva
-      window.addEventListener('DOMContentLoaded', () => {
-        BoldService.loadScript().catch(console.error);
-      });
     </script>
     <style>
         :root {
@@ -635,8 +606,6 @@
                 if(radio.value === 'bold') {
                     submitBtn.textContent = 'PAGAR CON BOLD';
                     submitBtn.className = 'btn-pay btn-bold';
-                    // Cargar script de Bold preventivamente
-                    BoldService.loadScript().catch(console.error);
                 } else {
                     submitBtn.textContent = 'REALIZAR PEDIDO AHORA';
                     submitBtn.className = 'btn-pay btn-cod';
@@ -714,30 +683,27 @@
             if(paymentMethod === 'bold') {
                 const publicKey = localStorage.getItem('bold_public_key') || 'ygTn3DLv8pWAaVextobWAcFourddvxr--TBx-6ToXUc';
                 const secretKey = localStorage.getItem('bold_secret_key') || '8WHXiTUKPucrCirwEc3nFg';
-                
-                // Validación de seguridad básica
-                if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-                    alert('⚠️ Bold requiere una conexión segura (HTTPS) para funcionar en producción.');
+
+                // Verificar que Bold se cargó correctamente
+                if (typeof BoldCheckout === 'undefined') {
+                    alert('La librería de pagos no se cargó. Recarga la página e intenta de nuevo.');
                     return;
                 }
 
                 const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'CONECTANDO CON BOLD...';
+                submitBtn.textContent = 'PROCESANDO...';
                 submitBtn.disabled = true;
 
-                const amountValue = "99900";
-                const currency = "COP";
-                const orderId = `ORD-${Date.now()}`;
+                const amountValue = '99900';
+                const currency = 'COP';
+                const orderId = 'ORD-' + Date.now();
 
                 (async () => {
                     try {
-                        // 1. Asegurar que la librería esté cargada
-                        await BoldService.loadScript();
-
-                        // 2. Generar firma de integridad
+                        // Generar firma de integridad SHA-256
                         const integritySignature = await BoldService.generateSignature(orderId, amountValue, currency, secretKey);
 
-                        // 3. Configurar y abrir el checkout
+                        // Abrir checkout embebido de Bold
                         const checkout = new BoldCheckout({
                             orderId: orderId,
                             currency: currency,
@@ -745,38 +711,22 @@
                             apiKey: publicKey,
                             integritySignature: integritySignature,
                             description: 'Ritual Ancestral de Arroz - Kit Completo',
-                            tax: 0, 
-                            originUrl: window.location.origin,
-                            redirectionUrl: window.location.href.replace('checkout.html', 'gracias.html'), 
-                            renderMode: 'embedded',
-                            customerData: JSON.stringify({
-                                email: email,
-                                fullName: name,
-                                phone: phone
-                            }),
-                            billingAddress: JSON.stringify({
-                                address: address,
-                                city: city,
-                                country: "CO"
-                            }),
-                            onResponse: function(response) {
-                                console.log('Bold Response:', response);
-                                if(response.status === 'APPROVED') {
-                                    saveOrder();
-                                    window.location.href = 'gracias.html';
-                                } else {
-                                    alert('El pago no pudo ser completado. Estado: ' + (response.status || 'Cancelado'));
-                                    submitBtn.textContent = originalText;
-                                    submitBtn.disabled = false;
-                                }
-                            }
+                            tax: '0',
+                            redirectionUrl: window.location.href.replace('checkout.html', 'gracias.html'),
+                            renderMode: 'embedded'
                         });
-                        
+
                         checkout.open();
 
+                        // Restaurar botón después de un tiempo por si el usuario cierra el modal de Bold
+                        setTimeout(() => {
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                        }, 3000);
+
                     } catch (error) {
-                        console.error('❌ Error en Integración Bold:', error);
-                        alert('Error al conectar con la pasarela: ' + error.message);
+                        console.error('Error Bold:', error);
+                        alert('Error al procesar el pago: ' + error.message);
                         submitBtn.textContent = originalText;
                         submitBtn.disabled = false;
                     }
