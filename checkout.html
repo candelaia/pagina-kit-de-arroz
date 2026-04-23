@@ -7,25 +7,50 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
     <!-- Step 1: Inicializar el script de Bold (Dinámico para mayor rendimiento) -->
     <script>
-      const initBoldCheckout = () => {
-        if (document.querySelector('script[src="https://checkout.bold.co/library/v0/checkout.js"]')) {
-          console.warn('Bold Checkout script is already loaded.');
-          return;
-        }
+      /**
+       * Bold Integration Service - Senior Implementation
+       * Maneja la carga asíncrona y la seguridad de la pasarela
+       */
+      const BoldService = {
+        scriptUrl: 'https://checkout.bold.co/library/v0/checkout.js',
+        isLoaded: false,
 
-        var js;
-        js = document.createElement('script');
-        js.onload = () => {
-          window.dispatchEvent(new Event('boldCheckoutLoaded'));
-          console.log('Bold Checkout loaded successfully.');
-        };
-        js.onerror = () => {
-          window.dispatchEvent(new Event('boldCheckoutLoadFailed'));
-          console.error('Bold Checkout load failed.');
-        };
-        js.src = 'https://checkout.bold.co/library/v0/checkout.js';
-        document.head.appendChild(js);
+        loadScript: function() {
+          return new Promise((resolve, reject) => {
+            if (window.BoldCheckout) {
+              this.isLoaded = true;
+              return resolve();
+            }
+
+            const script = document.createElement('script');
+            script.src = this.scriptUrl;
+            script.async = true;
+            script.onload = () => {
+              this.isLoaded = true;
+              console.log('✅ Bold Library Loaded');
+              resolve();
+            };
+            script.onerror = () => reject(new Error('No se pudo cargar la librería de Bold. Verifique su conexión o CSP.'));
+            document.head.appendChild(script);
+          });
+        },
+
+        generateSignature: async function(orderId, amount, currency, secret) {
+          if (!secret || secret === '8WHXiTUKPucrCirwEc3nFg') return null; // No firmar si es la llave por defecto
+          
+          const msg = `${orderId}${amount}${currency}${secret}`;
+          const encoder = new TextEncoder();
+          const data = encoder.encode(msg);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
       };
+
+      // Inicialización preventiva
+      window.addEventListener('DOMContentLoaded', () => {
+        BoldService.loadScript().catch(console.error);
+      });
     </script>
     <style>
         :root {
@@ -611,7 +636,7 @@
                     submitBtn.textContent = 'PAGAR CON BOLD';
                     submitBtn.className = 'btn-pay btn-bold';
                     // Cargar script de Bold preventivamente
-                    if (typeof initBoldCheckout === 'function') initBoldCheckout();
+                    BoldService.loadScript().catch(console.error);
                 } else {
                     submitBtn.textContent = 'REALIZAR PEDIDO AHORA';
                     submitBtn.className = 'btn-pay btn-cod';
@@ -690,106 +715,70 @@
                 const publicKey = localStorage.getItem('bold_public_key') || 'ygTn3DLv8pWAaVextobWAcFourddvxr--TBx-6ToXUc';
                 const secretKey = localStorage.getItem('bold_secret_key') || '8WHXiTUKPucrCirwEc3nFg';
                 
-                if(!publicKey) {
-                    alert('La pasarela de pagos Bold no está configurada. Por favor, contacta al administrador.');
+                // Validación de seguridad básica
+                if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+                    alert('⚠️ Bold requiere una conexión segura (HTTPS) para funcionar en producción.');
                     return;
                 }
 
-                // --- CONFIGURACIÓN DE SEGURIDAD BOLD ---
-                const advancedOrderId = "MY-ORDER789-" + Date.now();
-                const amountValue = "99900";
-                const currency = "COP";
-                
-                // Función para generar el Hash de Integridad (SHA256)
-                // Nota: Idealmente esto se hace en el servidor para proteger la Secret Key.
-                async function generateSignature(oid, amt, curr, secret) {
-                    const msg = oid + amt + curr + secret;
-                    const encoder = new TextEncoder();
-                    const data = encoder.encode(msg);
-                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-                    const hashArray = Array.from(new Uint8Array(hashBuffer));
-                    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-                }
-
-                // Mostrar estado de carga en el botón
                 const originalText = submitBtn.textContent;
                 submitBtn.textContent = 'CONECTANDO CON BOLD...';
                 submitBtn.disabled = true;
 
+                const amountValue = "99900";
+                const currency = "COP";
+                const orderId = `ORD-${Date.now()}`;
+
                 (async () => {
-                    let integritySignature = localStorage.getItem('bold_integrity_signature') || '';
-                    
-                    // Si el usuario proporcionó una Secret Key, generamos el hash dinámicamente
-                    if (secretKey && secretKey !== 'YOUR_SECRET_KEY' && !integritySignature) {
-                        integritySignature = await generateSignature(advancedOrderId, amountValue, currency, secretKey);
-                    } else if (!integritySignature) {
-                        integritySignature = "PENDING_HASH"; 
-                    }
+                    try {
+                        // 1. Asegurar que la librería esté cargada
+                        await BoldService.loadScript();
 
-                    const openCheckout = () => {
-                        try {
-                            if (typeof BoldCheckout === 'undefined') {
-                                throw new Error('La librería Bold no se ha cargado aún. Por favor, espera un momento y vuelve a intentarlo.');
-                            }
+                        // 2. Generar firma de integridad
+                        const integritySignature = await BoldService.generateSignature(orderId, amountValue, currency, secretKey);
 
-                            const checkout = new BoldCheckout({
-                                orderId: advancedOrderId,
-                                currency: currency,
-                                amount: amountValue,
-                                apiKey: publicKey,
-                                integritySignature: integritySignature,
-                                description: 'Ritual Ancestral de Arroz - Kit Completo',
-                                tax: 0, 
-                                originUrl: window.location.origin,
-                                redirectionUrl: window.location.origin + window.location.pathname.replace('checkout.html', 'gracias.html'), 
-                                expirationDate: Date.now() + (3600000 * 24), 
-                                renderMode: 'embedded',
-                                customerData: JSON.stringify({
-                                    email: email,
-                                    fullName: name,
-                                    phone: phone,
-                                    dialCode: '+57'
-                                }),
-                                billingAddress: JSON.stringify({
-                                    address: address,
-                                    city: city,
-                                    country: "CO"
-                                }),
-                                onResponse: function(response) {
-                                    if(response.status === 'APPROVED') {
-                                        saveOrder();
-                                        window.location.href = 'gracias.html';
-                                    } else {
-                                        alert('El pago no pudo ser procesado. Estado: ' + (response.status || 'Error'));
-                                        submitBtn.textContent = originalText;
-                                        submitBtn.disabled = false;
-                                    }
+                        // 3. Configurar y abrir el checkout
+                        const checkout = new BoldCheckout({
+                            orderId: orderId,
+                            currency: currency,
+                            amount: amountValue,
+                            apiKey: publicKey,
+                            integritySignature: integritySignature,
+                            description: 'Ritual Ancestral de Arroz - Kit Completo',
+                            tax: 0, 
+                            originUrl: window.location.origin,
+                            redirectionUrl: window.location.href.replace('checkout.html', 'gracias.html'), 
+                            renderMode: 'embedded',
+                            customerData: JSON.stringify({
+                                email: email,
+                                fullName: name,
+                                phone: phone
+                            }),
+                            billingAddress: JSON.stringify({
+                                address: address,
+                                city: city,
+                                country: "CO"
+                            }),
+                            onResponse: function(response) {
+                                console.log('Bold Response:', response);
+                                if(response.status === 'APPROVED') {
+                                    saveOrder();
+                                    window.location.href = 'gracias.html';
+                                } else {
+                                    alert('El pago no pudo ser completado. Estado: ' + (response.status || 'Cancelado'));
+                                    submitBtn.textContent = originalText;
+                                    submitBtn.disabled = false;
                                 }
-                            });
-                            
-                            checkout.open();
-
-                        } catch (error) {
-                            console.error('Error detallado de Bold:', error);
-                            alert('Error: ' + error.message);
-                            submitBtn.textContent = originalText;
-                            submitBtn.disabled = false;
-                        }
-                    };
-
-                    // Si la librería no está, la cargamos y esperamos
-                    if (typeof BoldCheckout === 'undefined') {
-                        window.addEventListener('boldCheckoutLoaded', openCheckout, { once: true });
-                        initBoldCheckout();
-                        setTimeout(() => {
-                            if (typeof BoldCheckout === 'undefined') {
-                                alert('La pasarela de pagos está tardando demasiado en cargar. Revisa tu conexión.');
-                                submitBtn.textContent = originalText;
-                                submitBtn.disabled = false;
                             }
-                        }, 8000);
-                    } else {
-                        openCheckout();
+                        });
+                        
+                        checkout.open();
+
+                    } catch (error) {
+                        console.error('❌ Error en Integración Bold:', error);
+                        alert('Error al conectar con la pasarela: ' + error.message);
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
                     }
                 })();
 
