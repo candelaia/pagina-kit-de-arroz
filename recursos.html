@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recursos - Blog de Cuidado Facial | Candela Prime</title>
+  <meta name="description" content="Artículos y guías sobre cuidado facial, rutinas coreanas de arroz y secretos de belleza. Blog de Candela Prime Colombia.">
+  <link rel="canonical" href="https://pagina-kit-de-arroz.vercel.app/recursos.html">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --gold-pale: #F5E6B8;
+      --cream: #FAF6EE;
+      --warm-white: #FEFCF7;
+      --dark: #1A1208;
+      --brown: #5C3D1E;
+      --text: #2C1F0E;
+      --text-muted: #7A6A52;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--warm-white);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ============ NAV ============ */
+    nav {
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(250,246,238,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--brown);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--gold); }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      font-size: 12px;
+      color: var(--brown);
+      text-decoration: none;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.7;
+      transition: 0.3s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
+    .nav-links a.active { opacity: 1; color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 2px; }
+
+    /* ============ HERO BLOG ============ */
+    .blog-hero {
+      background: linear-gradient(160deg, var(--dark) 0%, var(--brown) 100%);
+      padding: 80px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blog-hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(201,168,76,0.15), transparent 70%);
+      border-radius: 50%;
+    }
+
+    .blog-hero .section-label {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(201,168,76,0.3);
+      padding: 6px 20px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+    }
+
+    .blog-hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 48px;
+      color: var(--cream);
+      font-weight: 300;
+      margin-bottom: 16px;
+    }
+    .blog-hero h1 em { color: var(--gold-light); font-style: italic; }
+
+    .blog-hero p {
+      font-size: 16px;
+      color: rgba(250,246,238,0.6);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* ============ ARTICLES GRID ============ */
+    .articles-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 20px;
+    }
+
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 40px;
+    }
+
+    .article-card {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(201,168,76,0.1);
+      box-shadow: 0 10px 40px rgba(92,61,30,0.06);
+      transition: all 0.4s ease;
+    }
+    .article-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(92,61,30,0.12);
+    }
+
+    .article-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .article-card-body {
+      padding: 28px;
+    }
+
+    .article-tag {
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(201,168,76,0.1);
+      padding: 4px 12px;
+      border-radius: 50px;
+      margin-bottom: 14px;
+    }
+
+    .article-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      color: var(--brown);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .article-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .article-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: gap 0.3s ease;
+    }
+    .article-link:hover { gap: 14px; }
+
+    /* ============ FOOTER ============ */
+    footer {
+      background: #0D0804;
+      padding: 40px;
+      text-align: center;
+      border-top: 1px solid rgba(201,168,76,0.15);
+    }
+    footer .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      color: var(--gold);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    footer p {
+      font-size: 12px;
+      color: rgba(250,246,238,0.6);
+      letter-spacing: 1px;
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .blog-hero { padding: 50px 20px; }
+      .blog-hero h1 { font-size: 32px; }
+      .articles-section { padding: 50px 15px; }
+      .articles-grid { grid-template-columns: 1fr; gap: 30px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="./index.html" class="nav-logo">Candela <span>Prime</span></a>
+    <div class="nav-links">
+      <a href="./index.html">Inicio</a>
+      <a href="./recursos.html" class="active">Recursos</a>
+      <a href="./checkout.html">Comprar</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="blog-hero">
+    <div class="section-label">Blog & Recursos</div>
+    <h1>Conocimiento para tu <em>Piel</em></h1>
+    <p>Artículos, guías y secretos ancestrales para que logres la piel de porcelana que siempre soñaste.</p>
+  </section>
+
+  <!-- ARTICLES -->
+  <section class="articles-section">
+    <div class="articles-grid">
+
+      <!-- Artículo 1 -->
+      <article class="article-card">
+        <a href="./articulo-piel-de-porcelana.html">
+          <img src="./img/Gemini_Generated_Image_mtj1jlmtj1jlmtj1 (1).png" alt="Piel de Porcelana: Rutina Coreana de Arroz" loading="lazy">
+        </a>
+        <div class="article-card-body">
+          <span class="article-tag">Rutina Coreana</span>
+          <h3>Piel de Porcelana: Desvelando el Secreto Milenario de la Rutina Coreana de Arroz</h3>
+          <p>¿Alguna vez te has quedado hipnotizada mirando la piel de las mujeres coreanas? Esa textura impecable, sin poros visibles, con un tono uniforme y una luminosidad que parece nacer desde adentro...</p>
+          <a href="./articulo-piel-de-porcelana.html" class="article-link">Leer artículo →</a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Candela Prime</div>
+    <p>© 2026 Candela Prime · Todos los derechos reservados</p>
+  </footer>
+
+</body>
+</html>
