@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y Condiciones – Candela Prime</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #C9A84C;
+            --gold-light: #E8C97A;
+            --gold-pale: #F5E6B8;
+            --cream: #FAF6EE;
+            --warm-white: #FEFCF7;
+            --dark: #1A1208;
+            --brown: #5C3D1E;
+            --text: #2C1F0E;
+            --text-muted: #7A6A52;
+            --cookie-bg: rgba(26, 18, 8, 0.95);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--warm-white);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            border: 1px solid rgba(201,168,76,0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 2px solid var(--gold-pale);
+            padding-bottom: 30px;
+        }
+
+        header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            color: var(--brown);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            color: var(--gold);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .content h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            color: var(--brown);
+            margin: 40px 0 20px;
+            border-left: 4px solid var(--gold);
+            padding-left: 15px;
+        }
+
+        .content h3 {
+            font-size: 18px;
+            color: var(--text);
+            margin: 25px 0 15px;
+            font-weight: 600;
+        }
+
+        .content p {
+            margin-bottom: 15px;
+            font-weight: 300;
+            color: var(--text-muted);
+            text-align: justify;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 20px;
+            padding-left: 25px;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .content li {
+            margin-bottom: 10px;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--gold-pale);
+            padding-top: 30px;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-bottom: 30px;
+            text-decoration: none;
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            color: var(--brown);
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 30px 20px; }
+            header h1 { font-size: 28px; }
+        }
+
+        /* ============ COOKIE BANNER ============ */
+        .cookie-banner {
+            position: fixed;
+            bottom: -100px;
+            left: 20px;
+            right: 20px;
+            background: var(--cookie-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            border-radius: 16px;
+            padding: 20px 30px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.4);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .cookie-banner.active {
+            bottom: 20px;
+        }
+
+        .cookie-content {
+            flex: 1;
+        }
+
+        .cookie-content h4 {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--gold-light);
+            font-size: 18px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .cookie-content p {
+            color: rgba(250, 246, 238, 0.8);
+            font-size: 13px;
+            line-height: 1.5;
+            font-weight: 300;
+        }
+
+        .cookie-content a {
+            color: var(--gold);
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .cookie-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-cookie {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .btn-cookie-accept {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--dark);
+            border: none;
+            box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3);
+        }
+
+        .btn-cookie-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(201, 168, 76, 0.4);
+        }
+
+        .btn-cookie-reject {
+            background: transparent;
+            color: rgba(250, 246, 238, 0.6);
+            border: 1px solid rgba(250, 246, 238, 0.2);
+        }
+
+        .btn-cookie-reject:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .cookie-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+                padding: 25px;
+                left: 15px;
+                right: 15px;
+            }
+            .cookie-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            .btn-cookie {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="index.html" class="btn-back">← Volver al inicio</a>
+        
+        <header>
+            <h1>Términos y Condiciones</h1>
+            <p>CANDELA PRIME – kitdearroz.candelaprime.shop</p>
+        </header>
+
+        <div class="content">
+            <p><em>Última actualización: 21 de abril de 2026</em></p>
+
+            <h2>1. Identificación del responsable</h2>
+            <p>Estos Términos y Condiciones regulan el acceso, uso y las compras realizadas en el sitio web kitdearroz.candelaprime.shop (en adelante, la “Tienda”), operado por <strong>Candela Prime</strong>, con domicilio en Envigado, Antioquia, Colombia y correo de contacto info@candelaprime.shop.</p>
+            <p>Al realizar una compra en la Tienda, el consumidor (en adelante, el “Cliente”) declara que conoce y acepta estos Términos y Condiciones, así como las demás políticas publicadas en el sitio.</p>
+
+            <h2>2. Aceptación de los términos</h2>
+            <p>2.1. Al navegar en la Tienda, crear una cuenta o realizar una compra, el Cliente acepta de manera expresa e informada estos Términos y Condiciones.</p>
+            <p>2.2. Si el Cliente no está de acuerdo con alguna de las disposiciones aquí contenidas, deberá abstenerse de usar la Tienda o de completar el proceso de compra.</p>
+            <p>2.3. La Tienda podrá modificar estos Términos y Condiciones en cualquier momento; las compras se regirán por la versión vigente al momento de la confirmación del pedido.</p>
+
+            <h2>3. Descripción del producto – Kit BioAqua Arroz</h2>
+            <p>3.1. Los productos comercializados como “Kit BioAqua Arroz” son cosméticos de uso externo, importados y destinados al cuidado de la piel.</p>
+            <p>3.2. Las imágenes utilizadas en la Tienda son de carácter ilustrativo; el empaque, diseño y presentación del producto pueden variar sin previo aviso, manteniendo sus características esenciales y funcionalidad.</p>
+            <p>3.3. Los resultados pueden variar según el tipo de piel, hábitos, condiciones particulares del usuario y constancia en el uso del producto. La Tienda no garantiza resultados específicos ni tiempos determinados.</p>
+            <p>3.4. Los productos cuentan con Registro Sanitario INVIMA (NSOC05900-21CO), requisito obligatorio para la comercialización de cosméticos en Colombia.</p>
+            <p>3.5. La información de uso, precauciones y advertencias se encuentra en el empaque y/o inserto del producto; el Cliente se compromete a leerla detenidamente antes de usarlo.</p>
+
+            <h2>4. Modalidad de venta y disponibilidad</h2>
+            <p>4.1. El modelo de operación de la Tienda puede incluir el envío directo desde bodegas propias y/o de terceros bajo la modalidad de dropshipping.</p>
+            <p>4.2. La disponibilidad de productos depende del inventario real; en caso de falta de disponibilidad luego de la compra, se gestionará el reenvío o la devolución del dinero.</p>
+
+            <h2>5. Política de envíos y entregas</h2>
+            <p>5.1. Los pedidos se procesan y despachan normalmente en un plazo de 2 a 5 días hábiles después de la confirmación del pago.</p>
+            <p>5.2. Los tiempos de entrega dependen de la transportadora y la ciudad de destino. Se informarán tiempos estimados sujetos a factores externos.</p>
+            <p>5.3. En caso de pérdida confirmada por la transportadora, la Tienda gestionará el reenvío del producto o la devolución del dinero según elección del Cliente.</p>
+
+            <h2>6. Naturaleza del producto y devoluciones</h2>
+            <p>6.1. El Kit BioAqua Arroz son productos cosméticos de uso personal que, por razones de higiene y seguridad, no pueden ser revendidos una vez abiertos o usados.</p>
+            <p>6.2. NO se aceptan devoluciones por razones de gusto personal o expectativas no cumplidas si el producto ya ha sido abierto.</p>
+            <p>6.3. El derecho de retracto de 5 días hábiles aplica solo si el producto se devuelve sin uso, en su empaque original sellado y accesorios completos.</p>
+
+            <h2>7. Política de garantías</h2>
+            <p>7.1. La garantía aplica si el producto llega en mal estado (empaque roto, fugas) y se reporta en las primeras 24 horas con evidencia fotográfica.</p>
+            <p>7.2. Para hacerla efectiva, escriba a <strong>info@candelaprime.shop</strong> con su número de pedido y descripción del daño.</p>
+
+            <h2>8. Privacidad y Protección de Datos</h2>
+            <p>8.1. Sus datos se usarán exclusivamente para procesar pedidos, atención al cliente y comunicaciones autorizadas, conforme a la Ley 1581 de 2012 de Colombia.</p>
+
+            <h2>9. Comunicaciones</h2>
+            <p>9.1. Los canales oficiales son el correo electrónico: <strong>info@candelaprime.shop</strong> y la plataforma de soporte oficial.</p>
+
+            <h2>10. Legislación Aplicable</h2>
+            <p>10.1. Estos términos se rigen por las leyes de las República de Colombia, especialmente el Estatuto del Consumidor (Ley 1480 de 2011).</p>
+
+            <h2 id="cookies">11. Política de Cookies</h2>
+            <p>11.1. <strong>¿Qué son las cookies?</strong> Las cookies son pequeños archivos de texto que se almacenan en su navegador cuando visita nuestro sitio web. Ayudan a que el sitio funcione correctamente, sea más seguro y proporcione una mejor experiencia de usuario.</p>
+            <p>11.2. <strong>Tipos de cookies que utilizamos:</strong></p>
+            <ul>
+                <li><strong>Cookies Técnicas:</strong> Son esenciales para que el sitio web funcione. Permiten la navegación, el uso de opciones de seguridad y el acceso al carrito de compras.</li>
+                <li><strong>Cookies de Análisis:</strong> Nos ayudan a entender cómo los visitantes interactúan con la Tienda (por ejemplo, qué páginas son las más visitadas) para mejorar nuestros servicios.</li>
+                <li><strong>Cookies de Marketing:</strong> Se utilizan para rastrear a los visitantes a través de las webs con la intención de mostrar anuncios que sean relevantes y atractivos para el usuario individual.</li>
+            </ul>
+            <p>11.3. <strong>Gestión de cookies:</strong> El Cliente puede aceptar, rechazar o configurar sus preferencias de cookies a través del panel de configuración que aparece al ingresar a la web. También puede gestionar las cookies desde la configuración de su propio navegador.</p>
+            <p>11.4. Al continuar navegando tras haber aceptado nuestro aviso de cookies, usted consiente el uso de las mismas para las finalidades descritas.</p>
+        </div>
+
+        <footer>
+            <p>© 2026 Candela Prime · Envigado, Antioquia, Colombia</p>
+            <p>Todos los derechos reservados</p>
+        </footer>
+    </div>
+
+    </div>
+
+    <!-- ============ COOKIE BANNER HTML ============ -->
+    <div id="cookie-banner" class="cookie-banner">
+        <div class="cookie-content">
+            <h4>Experiencia Premium & Privacidad</h4>
+            <p>Utilizamos cookies propias y de terceros para mejorar tu experiencia de navegación y analizar nuestro tráfico. 
+                Puedes leer más en nuestra <a href="#cookies">Política de Cookies</a>.</p>
+        </div>
+        <div class="cookie-actions">
+            <button onclick="handleCookieChoice('rejected')" class="btn-cookie btn-cookie-reject">Rechazar</button>
+            <button onclick="handleCookieChoice('accepted')" class="btn-cookie btn-cookie-accept">Aceptar Todo</button>
+        </div>
+    </div>
+
+    <script>
+        // Cookie Banner Logic
+        function handleCookieChoice(choice) {
+            localStorage.setItem('cookieConsent', choice);
+            document.getElementById('cookie-banner').classList.remove('active');
+        }
+
+        window.addEventListener('load', () => {
+            const consent = localStorage.getItem('cookieConsent');
+            if (!consent) {
+                setTimeout(() => {
+                    document.getElementById('cookie-banner').classList.add('active');
+                }, 2000);
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Pedido | Ritual Ancestral de Arroz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Step 1: Inicializar el script de Bold (Dinámico para mayor rendimiento) -->
+    <script>
+      const initBoldCheckout = () => {
+        if (document.querySelector('script[src="https://checkout.bold.co/library/v0/checkout.js"]')) {
+          console.warn('Bold Checkout script is already loaded.');
+          return;
+        }
+
+        var js;
+        js = document.createElement('script');
+        js.onload = () => {
+          window.dispatchEvent(new Event('boldCheckoutLoaded'));
+          console.log('Bold Checkout loaded successfully.');
+        };
+        js.onerror = () => {
+          window.dispatchEvent(new Event('boldCheckoutLoadFailed'));
+          console.error('Bold Checkout load failed.');
+        };
+        js.src = 'https://checkout.bold.co/library/v0/checkout.js';
+        document.head.appendChild(js);
+      };
+    </script>
+    <style>
+        :root {
+            --gold: #C9A84C;
+            --gold-light: #E8C97A;
+            --gold-pale: #F5E6B8;
+            --cream: #FAF6EE;
+            --warm-white: #FEFCF7;
+            --dark: #1A1208;
+            --brown: #5C3D1E;
+            --text: #2C1F0E;
+            --text-muted: #7A6A52;
+            --red-cta: #C0392B;
+            --cookie-bg: rgba(26, 18, 8, 0.95);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--warm-white);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Navbar Refined */
+        nav {
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(250,246,238,0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--brown);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .nav-logo span { color: var(--gold); }
+
+        .checkout-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 850px) {
+            .checkout-container { grid-template-columns: 1fr; margin: 20px auto; }
+            .section-card { padding: 20px; }
+            h2 { font-size: 24px; }
+        }
+
+        @media (max-width: 480px) {
+            .product-summary { flex-direction: column; text-align: center; }
+            .product-img { width: 100%; height: auto; max-width: 200px; }
+            .price-tag { font-size: 24px; }
+            .btn-pay { padding: 15px; font-size: 14px; }
+            nav { padding: 10px 15px; }
+            .nav-logo { font-size: 20px; }
+        }
+
+        .section-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(201,168,76,0.1);
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: var(--brown);
+            border-bottom: 1px solid var(--gold-pale);
+            padding-bottom: 10px;
+        }
+
+        .product-summary {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .product-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--gold-pale);
+        }
+        .product-info h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            color: var(--dark);
+        }
+        .price-tag {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 20px;
+            margin: 5px 0;
+        }
+        .shipping-badge {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .description-content {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .description-content p { margin-bottom: 15px; }
+        .description-content strong { color: var(--brown); }
+
+        /* Form styling */
+        .form-group { margin-bottom: 20px; }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(201,168,76,0.1);
+        }
+
+        .payment-methods {
+            display: grid;
+            gap: 15px;
+        }
+        .payment-option {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .payment-option:hover { border-color: var(--gold); }
+        .payment-option.selected {
+            border-color: var(--gold);
+            background: rgba(201,168,76,0.05);
+        }
+        .payment-option input { width: auto; }
+
+        .btn-pay {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+        .btn-cod {
+            background: var(--dark);
+            color: #fff;
+        }
+        .btn-bold {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--dark);
+            box-shadow: 0 4px 15px rgba(201,168,76,0.3);
+        }
+        .btn-pay:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        .neuro-tip {
+            background: #fdfae5;
+            border-left: 4px solid var(--gold);
+            padding: 15px;
+            font-size: 13px;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        /* Footer Link Styles */
+        footer {
+            padding: 40px 20px;
+            text-align: center;
+            background: var(--dark);
+            color: rgba(250,246,238,0.5);
+            margin-top: 60px;
+        }
+        .footer-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        .footer-link-discrete {
+            font-size: 11px;
+            color: rgba(250,246,238,0.3);
+            text-decoration: none;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            display: inline-block;
+            padding: 5px 10px;
+            margin-top: 15px;
+        }
+        .footer-link-discrete:hover {
+            color: var(--gold-light);
+            transform: translateY(-2px);
+            text-shadow: 0 0 8px rgba(232,201,122,0.4);
+        }
+
+        /* ============ COOKIE BANNER ============ */
+        .cookie-banner {
+            position: fixed;
+            bottom: -100px;
+            left: 20px;
+            right: 20px;
+            background: var(--cookie-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 16px;
+            padding: 20px 30px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.4);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .cookie-banner.active {
+            bottom: 20px;
+        }
+
+        .cookie-content {
+            flex: 1;
+        }
+
+        .cookie-content h4 {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--gold-light);
+            font-size: 18px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .cookie-content p {
+            color: rgba(250, 246, 238, 0.8);
+            font-size: 13px;
+            line-height: 1.5;
+            font-weight: 300;
+        }
+
+        .cookie-content a {
+            color: var(--gold);
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .cookie-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-cookie {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .btn-cookie-accept {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--dark);
+            border: none;
+            box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3);
+        }
+
+        .btn-cookie-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(201, 168, 76, 0.4);
+        }
+
+        .btn-cookie-reject {
+            background: transparent;
+            color: rgba(250, 246, 238, 0.6);
+            border: 1px solid rgba(250, 246, 238, 0.2);
+        }
+
+        .btn-cookie-reject:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .cookie-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+                padding: 25px;
+                left: 15px;
+                right: 15px;
+            }
+            .cookie-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            .btn-cookie {
+                flex: 1;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">Candela <span>Prime</span></div>
+    </nav>
+
+    <div class="checkout-container">
+        <!-- Left Side: Order details and Info -->
+        <div class="order-details">
+            <div class="section-card">
+                <h2>Tu Pedido</h2>
+                <div class="product-summary">
+                    <img src="Gemini_Generated_Image_9pr1lx9pr1lx9pr1.png" alt="Bioaqua Kit" class="product-img">
+                    <div class="product-info">
+                        <h3>Ritual Ancestral de Porcelana: Kit Completo BioAqua Arroz</h3>
+                        <p class="price-tag">$99.900 COP</p>
+                        <span class="shipping-badge">Envío Gratis Hoy</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card description-content">
+                <h2>Descripción del Ritual</h2>
+                <p>Despierta la luminosidad natural de tu piel con el secreto mejor guardado de la belleza asiática.</p>
+                <p>¿Sientes que tu piel ha perdido su brillo natural, está apagada o notas líneas de expresión que antes no estaban? No necesitas procesos complejos. Hemos condensado la sabiduría milenaria del arroz —rico en vitaminas E, B y almidón— en un ritual de 6 pasos diseñado para reparar, aclarar y rejuvenecer tu rostro mientras descansas.</p>
+                
+                <p><strong>¿Por qué tu piel necesita este ritual?</strong><br>
+                El arroz no es solo alimento; es un potente antioxidante natural que combate el envejecimiento prematuro, atenúa manchas y crea un efecto de "piel de porcelana".</p>
+
+                <p><strong>Tu Kit Incluye:</strong></p>
+                <ul style="list-style: none; padding-left: 0;">
+                    <li>✨ <strong>Jabón Facial (100g):</strong> Elimina impurezas.</li>
+                    <li>✨ <strong>Exfoliante (140mL):</strong> Renovación celular profunda.</li>
+                    <li>✨ <strong>Suero de Arroz (15mL):</strong> Hidratación de alta potencia.</li>
+                    <li>✨ <strong>Crema Hidratante (50g):</strong> Escudo protector.</li>
+                    <li>✨ <strong>Contorno de Ojos (20g):</strong> Hidratación intensa.</li>
+                    <li>✨ <strong>Velo Facial:</strong> Reparación intensiva.</li>
+                </ul>
+                
+                <div class="neuro-tip">
+                    <strong>Neuro-tip:</strong> Al usar este sistema cada noche, no solo cuidas tu piel; le estás dando a tu cerebro una señal de calma y bienestar que reduce tus niveles de cortisol.
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Checkout Form -->
+        <div class="checkout-form">
+            <div class="section-card" id="form-container">
+                <h2>Datos de Envío</h2>
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" id="customer-name" placeholder="Ej: Maria Perez" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono / WhatsApp</label>
+                        <input type="tel" id="customer-phone" placeholder="Ej: 3001234567" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Correo Electrónico (Para enviar tu Guía PDF)</label>
+                        <input type="email" id="customer-email" placeholder="ejemplo@correo.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ciudad / Municipio</label>
+                        <input type="text" id="customer-city" placeholder="Ej: Medellín" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Dirección de entrega</label>
+                        <input type="text" id="customer-address" placeholder="Calle, Carrera, Apto..." required>
+                    </div>
+
+                    <h2 style="margin-top: 30px;">Método de Pago</h2>
+                    <div class="payment-methods">
+                        <label class="payment-option selected">
+                            <input type="radio" name="payment" value="cod" checked>
+                            <div>
+                                <strong>Pago Contra Entrega</strong>
+                                <p style="font-size: 11px; color: var(--text-muted);">Pagas en efectivo al recibir el producto</p>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="bold">
+                            <div>
+                                <strong>Tarjeta / Nequi / PSE (Bold)</strong>
+                                <p style="font-size: 11px; color: var(--text-muted);">Pago seguro online</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-pay btn-cod" id="submitBtn">
+                        REALIZAR PEDIDO AHORA
+                    </button>
+                    <p style="text-align:center; font-size: 11px; margin-top: 15px; color: var(--text-muted);">
+                        🔒 Compra 100% Protegida por Candela Prime
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-logo">Candela Prime</div>
+        <p style="font-size: 12px;">© 2026 Candela Prime · Envigado, Antioquia, Colombia</p>
+        <a href="terminos-y-condiciones.html" class="footer-link-discrete">Términos y Condiciones</a>
+    </footer>
+
+    <!-- ============ COOKIE BANNER HTML ============ -->
+    <div id="cookie-banner" class="cookie-banner">
+        <div class="cookie-content">
+            <h4>Experiencia Premium & Privacidad</h4>
+            <p>Utilizamos cookies propias y de terceros para mejorar tu experiencia de navegación y analizar nuestro tráfico. 
+                Puedes leer más en nuestra <a href="terminos-y-condiciones.html#cookies">Política de Cookies</a>.</p>
+        </div>
+        <div class="cookie-actions">
+            <button onclick="handleCookieChoice('rejected')" class="btn-cookie btn-cookie-reject">Rechazar</button>
+            <button onclick="handleCookieChoice('accepted')" class="btn-cookie btn-cookie-accept">Aceptar Todo</button>
+        </div>
+    </div>
+
+
+    <script>
+        // Simple Interaction logic
+        const options = document.querySelectorAll('.payment-option');
+        const submitBtn = document.getElementById('submitBtn');
+
+        options.forEach(opt => {
+            opt.addEventListener('click', () => {
+                options.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                const radio = opt.querySelector('input');
+                radio.checked = true;
+
+                if(radio.value === 'bold') {
+                    submitBtn.textContent = 'PAGAR CON BOLD';
+                    submitBtn.className = 'btn-pay btn-bold';
+                    // Cargar script de Bold preventivamente
+                    if (typeof initBoldCheckout === 'function') initBoldCheckout();
+                } else {
+                    submitBtn.textContent = 'REALIZAR PEDIDO AHORA';
+                    submitBtn.className = 'btn-pay btn-cod';
+                }
+            });
+        });
+
+        // Track abandoned carts
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => {
+                const email = document.querySelector('input[type="email"]').value;
+                const phone = document.querySelector('input[type="tel"]').value;
+                if(email || phone) {
+                    const cart = {
+                        contact: phone || email,
+                        date: new Date().toLocaleString(),
+                        value: '$99.900',
+                        status: 'abandoned'
+                    };
+                    let abandoned = JSON.parse(localStorage.getItem('abandoned_carts') || '[]');
+                    // Prevent duplicates
+                    if(!abandoned.find(c => c.contact === cart.contact)) {
+                        abandoned.push(cart);
+                        localStorage.setItem('abandoned_carts', JSON.stringify(abandoned));
+                    }
+                }
+            });
+        });
+
+        document.getElementById('orderForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            const name = document.getElementById('customer-name').value;
+            const email = document.getElementById('customer-email').value;
+            const city = document.getElementById('customer-city').value;
+            const phone = document.getElementById('customer-phone').value;
+            const address = document.getElementById('customer-address').value;
+            
+            const orderData = {
+                id: '#' + Math.floor(1000 + Math.random()*9000),
+                date: new Date().toLocaleString('es-CO', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }),
+                customerName: name,
+                customerEmail: email,
+                customerPhone: phone,
+                city: city,
+                amount: '$99.900',
+                method: paymentMethod === 'bold' ? 'Bold (Tarjeta/PSE)' : 'Contra Entrega',
+                status: paymentMethod === 'bold' ? 'Pagado' : 'Pendiente'
+            };
+
+            function saveOrder() {
+                // Save Order
+                let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                orders.unshift(orderData);
+                localStorage.setItem('orders', JSON.stringify(orders));
+
+                // Save/Update Customer
+                let customers = JSON.parse(localStorage.getItem('customers') || '[]');
+                let existing = customers.find(c => c.contact === (phone || email));
+                if(existing) {
+                    existing.orderCount++;
+                } else {
+                    customers.push({ name, city, contact: phone || email, orderCount: 1 });
+                }
+                localStorage.setItem('customers', JSON.stringify(customers));
+
+                // Remove from abandoned
+                let abandoned = JSON.parse(localStorage.getItem('abandoned_carts') || '[]');
+                abandoned = abandoned.filter(c => c.contact !== (phone || email));
+                localStorage.setItem('abandoned_carts', JSON.stringify(abandoned));
+            }
+            
+            if(paymentMethod === 'bold') {
+                const publicKey = localStorage.getItem('bold_public_key') || 'ygTn3DLv8pWAaVextobWAcFourddvxr--TBx-6ToXUc';
+                const secretKey = localStorage.getItem('bold_secret_key') || '8WHXiTUKPucrCirwEc3nFg';
+                
+                if(!publicKey) {
+                    alert('La pasarela de pagos Bold no está configurada. Por favor, contacta al administrador.');
+                    return;
+                }
+
+                // --- CONFIGURACIÓN DE SEGURIDAD BOLD ---
+                const advancedOrderId = "MY-ORDER789-" + Date.now();
+                const amountValue = "99900";
+                const currency = "COP";
+                
+                // Función para generar el Hash de Integridad (SHA256)
+                // Nota: Idealmente esto se hace en el servidor para proteger la Secret Key.
+                async function generateSignature(oid, amt, curr, secret) {
+                    const msg = oid + amt + curr + secret;
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(msg);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                }
+
+                // Mostrar estado de carga en el botón
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'CONECTANDO CON BOLD...';
+                submitBtn.disabled = true;
+
+                (async () => {
+                    let integritySignature = localStorage.getItem('bold_integrity_signature') || '';
+                    
+                    // Si el usuario proporcionó una Secret Key, generamos el hash dinámicamente
+                    if (secretKey && secretKey !== 'YOUR_SECRET_KEY' && !integritySignature) {
+                        integritySignature = await generateSignature(advancedOrderId, amountValue, currency, secretKey);
+                    } else if (!integritySignature) {
+                        integritySignature = "PENDING_HASH"; 
+                    }
+
+                    const openCheckout = () => {
+                        try {
+                            if (typeof BoldCheckout === 'undefined') {
+                                throw new Error('La librería Bold no se ha cargado aún. Por favor, espera un momento y vuelve a intentarlo.');
+                            }
+
+                            const checkout = new BoldCheckout({
+                                orderId: advancedOrderId,
+                                currency: currency,
+                                amount: amountValue,
+                                apiKey: publicKey,
+                                integritySignature: integritySignature,
+                                description: 'Ritual Ancestral de Arroz - Kit Completo',
+                                tax: 0, 
+                                originUrl: window.location.origin,
+                                redirectionUrl: window.location.origin + window.location.pathname.replace('checkout.html', 'gracias.html'), 
+                                expirationDate: Date.now() + (3600000 * 24), 
+                                renderMode: 'embedded',
+                                customerData: JSON.stringify({
+                                    email: email,
+                                    fullName: name,
+                                    phone: phone,
+                                    dialCode: '+57'
+                                }),
+                                billingAddress: JSON.stringify({
+                                    address: address,
+                                    city: city,
+                                    country: "CO"
+                                }),
+                                onResponse: function(response) {
+                                    if(response.status === 'APPROVED') {
+                                        saveOrder();
+                                        window.location.href = 'gracias.html';
+                                    } else {
+                                        alert('El pago no pudo ser procesado. Estado: ' + (response.status || 'Error'));
+                                        submitBtn.textContent = originalText;
+                                        submitBtn.disabled = false;
+                                    }
+                                }
+                            });
+                            
+                            checkout.open();
+
+                        } catch (error) {
+                            console.error('Error detallado de Bold:', error);
+                            alert('Error: ' + error.message);
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                        }
+                    };
+
+                    // Si la librería no está, la cargamos y esperamos
+                    if (typeof BoldCheckout === 'undefined') {
+                        window.addEventListener('boldCheckoutLoaded', openCheckout, { once: true });
+                        initBoldCheckout();
+                        setTimeout(() => {
+                            if (typeof BoldCheckout === 'undefined') {
+                                alert('La pasarela de pagos está tardando demasiado en cargar. Revisa tu conexión.');
+                                submitBtn.textContent = originalText;
+                                submitBtn.disabled = false;
+                            }
+                        }, 8000);
+                    } else {
+                        openCheckout();
+                    }
+                })();
+
+            } else {
+                saveOrder();
+                alert('¡Gracias por tu pedido! Nos comunicaremos contigo por WhatsApp.');
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Cookie Banner Logic
+        function handleCookieChoice(choice) {
+            localStorage.setItem('cookieConsent', choice);
+            document.getElementById('cookie-banner').classList.remove('active');
+        }
+
+        window.addEventListener('load', () => {
+            const consent = localStorage.getItem('cookieConsent');
+            if (!consent) {
+                setTimeout(() => {
+                    document.getElementById('cookie-banner').classList.add('active');
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
