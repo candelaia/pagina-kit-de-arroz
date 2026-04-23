@@ -3004,32 +3004,34 @@
         CONTEXTO ACTUAL DE LA PÁGINA:
         ${this.context}
         
-        INSTRUCCIÓN FINAL: Responde siempre en español, de forma extremadamente profesional, persuasiva y amable. Si no sabes algo, usa el conocimiento específico o redirige al usuario a los contactos autorizados.`;
-        
+        INSTRUCCIÓN FINAL: Responde siempre en español, de forma extremadamente profesional, persuasiva y amable. Sé concisa (máximo 3 párrafos). Si no sabes algo, usa el conocimiento específico o redirige al usuario a los contactos autorizados.`;
 
         const isOpenRouter = this.apiKey.startsWith('sk-or-');
         const url = isOpenRouter 
           ? 'https://openrouter.ai/api/v1/chat/completions'
-          : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`;
+          : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${this.apiKey}`;
         
         const headers = { 'Content-Type': 'application/json' };
         if (isOpenRouter) {
           headers['Authorization'] = `Bearer ${this.apiKey}`;
-          headers['HTTP-Referer'] = window.location.href;
-          headers['X-Title'] = 'Candela AI Assistant';
+          headers['HTTP-Referer'] = window.location.origin || window.location.href;
+          headers['X-Title'] = 'Candela Prime AI Assistant';
         }
 
         const body = isOpenRouter ? {
-          model: 'openrouterfree',
+          model: 'google/gemma-3-27b-it:free',
           messages: [
             { role: 'system', content: systemInstruction },
             { role: 'user', content: prompt }
-          ]
+          ],
+          max_tokens: 500
         } : {
           contents: [{
             parts: [{ text: systemInstruction + "\n\nUSUARIO: " + prompt }]
           }]
         };
+
+        console.log('🤖 Chatbot API Request:', isOpenRouter ? 'OpenRouter' : 'Gemini', 'Model:', body.model || 'gemini-2.0-flash');
 
         const response = await fetch(url, {
           method: 'POST',
@@ -3037,18 +3039,28 @@
           body: JSON.stringify(body)
         });
 
+        if (!response.ok) {
+          const errorBody = await response.text();
+          console.error('❌ API Error:', response.status, errorBody);
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+
         const data = await response.json();
+        console.log('✅ API Response:', data);
         
         if (isOpenRouter) {
-          if (data.choices && data.choices[0].message.content) {
-            return data.choices[0].message.content;
-          }
+          const content = data?.choices?.[0]?.message?.content;
+          if (content) return content;
         } else {
-          if (data.candidates && data.candidates[0].content.parts[0].text) {
-            return data.candidates[0].content.parts[0].text;
-          }
+          const content = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (content) return content;
         }
-        throw new Error('Respuesta inválida de la API: ' + JSON.stringify(data));
+
+        // If we got here, the response structure was unexpected
+        if (data?.error) {
+          throw new Error(data.error.message || JSON.stringify(data.error));
+        }
+        throw new Error('Respuesta inesperada de la API. Revisa la consola (F12) para más detalles.');
       }
     }
 
