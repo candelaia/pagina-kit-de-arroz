@@ -2816,10 +2816,46 @@
         </div>
       </div>
       <div class="chat-actions">
+        <button class="chat-action-btn" onclick="chatbot.toggleTraining(); chatbot.loadSettings();" title="Configuración">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
         <button class="chat-action-btn" onclick="chatbot.toggle()" title="Cerrar">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
+    </div>
+
+    <!-- Settings/Training Panel -->
+    <div id="training-panel" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:var(--chat-dark,#1A1208); z-index:100; padding:25px; overflow-y:auto; font-family:'Jost',sans-serif;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3 style="color:#C9A84C; font-family:'Cormorant Garamond',serif; margin:0; font-size:20px;">⚙️ Configuración IA</h3>
+        <button onclick="chatbot.toggleTraining()" style="background:none; border:none; color:rgba(250,246,238,0.6); cursor:pointer; font-size:20px;">✕</button>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:11px; color:rgba(250,246,238,0.7); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">🔑 API Key</label>
+        <input type="text" id="api-key-input" placeholder="sk-or-... o tu JWT token" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.2); border-radius:10px; color:#fff; font-family:inherit; font-size:12px;">
+        <p style="font-size:10px; color:rgba(250,246,238,0.4); margin-top:4px;">OpenRouter (sk-or-...) | Gemini (AIza...) | Servidor propio (JWT u otro)</p>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:11px; color:rgba(250,246,238,0.7); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">🌐 URL del Servidor (solo para servidor propio)</label>
+        <input type="text" id="api-url-input" placeholder="https://tu-servidor.com/api/v1" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.2); border-radius:10px; color:#fff; font-family:inherit; font-size:12px;">
+        <p style="font-size:10px; color:rgba(250,246,238,0.4); margin-top:4px;">Déjalo vacío para OpenRouter o Gemini. Para servidor propio pon la URL base.</p>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:11px; color:rgba(250,246,238,0.7); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">🤖 Modelo (opcional)</label>
+        <input type="text" id="api-model-input" placeholder="google/gemma-3-27b-it:free" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.2); border-radius:10px; color:#fff; font-family:inherit; font-size:12px;">
+        <p style="font-size:10px; color:rgba(250,246,238,0.4); margin-top:4px;">Déjalo vacío para usar el modelo por defecto.</p>
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <label style="display:block; font-size:11px; color:rgba(250,246,238,0.7); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">📚 Entrenamiento Extra</label>
+        <textarea id="training-text" placeholder="Escribe información adicional para entrenar al agente..." style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.2); border-radius:10px; color:#fff; font-family:inherit; font-size:12px; height:100px; resize:none;"></textarea>
+      </div>
+
+      <button onclick="chatbot.saveTraining()" style="width:100%; padding:14px; background:#C9A84C; color:#1A1208; border:none; border-radius:10px; font-weight:600; cursor:pointer; text-transform:uppercase; letter-spacing:1px; font-family:inherit;">GUARDAR CONFIGURACIÓN</button>
     </div>
 
     <!-- Messages -->
@@ -2861,7 +2897,9 @@
         this.isTrainingOpen = false;
         this.isListening = false;
         this.recognition = null;
-        this.apiKey = localStorage.getItem('chatbot_api_key') || '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';
+        this.apiKey = localStorage.getItem('chatbot_api_key') || '';
+        this.apiUrl = localStorage.getItem('chatbot_api_url') || '';
+        this.apiModel = localStorage.getItem('chatbot_api_model') || '';
         this.agentName = localStorage.getItem('chatbot_agent_name') || 'Asistente Candela Prime';
         this.purpose = localStorage.getItem('chatbot_purpose') || '';
         this.goldenRules = localStorage.getItem('chatbot_golden_rules') || '';
@@ -2872,6 +2910,18 @@
         
         this.initSpeech();
         this.extractPageContext();
+      }
+
+      /**
+       * Detecta automáticamente el proveedor de IA según la API Key:
+       * - 'openrouter' → keys que empiezan con 'sk-or-'
+       * - 'gemini'     → keys que empiezan con 'AIza'
+       * - 'custom'     → todo lo demás (JWT, tokens de servidor propio, etc.)
+       */
+      detectProvider() {
+        if (this.apiKey.startsWith('sk-or-')) return 'openrouter';
+        if (this.apiKey.startsWith('AIza')) return 'gemini';
+        return 'custom';
       }
 
       initSpeech() {
@@ -2902,7 +2952,8 @@
 
       toggleTraining() {
         this.isTrainingOpen = !this.isTrainingOpen;
-        document.getElementById('training-panel').classList.toggle('active', this.isTrainingOpen);
+        const panel = document.getElementById('training-panel');
+        if (panel) panel.style.display = this.isTrainingOpen ? 'block' : 'none';
       }
 
       toggleSpeech() {
@@ -2918,28 +2969,44 @@
       }
 
       extractPageContext() {
-        // Extract text from headings and paragraphs
         const texts = Array.from(document.querySelectorAll('h1, h2, h3, p, li'))
           .map(el => el.innerText)
           .filter(t => t.length > 20)
           .join('\n');
-        this.context = texts.substring(0, 5000); // Limit context
+        this.context = texts.substring(0, 3000);
       }
 
       loadSettings() {
-        document.getElementById('api-key-input').value = this.apiKey;
-        document.getElementById('training-text').value = this.extraTraining;
+        const keyInput = document.getElementById('api-key-input');
+        const urlInput = document.getElementById('api-url-input');
+        const modelInput = document.getElementById('api-model-input');
+        const trainingInput = document.getElementById('training-text');
+        if (keyInput) keyInput.value = this.apiKey;
+        if (urlInput) urlInput.value = this.apiUrl;
+        if (modelInput) modelInput.value = this.apiModel;
+        if (trainingInput) trainingInput.value = this.extraTraining;
       }
 
       saveTraining() {
-        this.apiKey = document.getElementById('api-key-input').value;
-        this.extraTraining = document.getElementById('training-text').value;
-        localStorage.setItem('chatbot_api_key', this.apiKey);
-        localStorage.setItem('chatbot_extra_training', this.extraTraining);
-        this.toggleTraining();
-        this.addMessage('Configuración guardada correctamente. El agente ha sido actualizado.', 'assistant');
-      }
+        const keyInput = document.getElementById('api-key-input');
+        const urlInput = document.getElementById('api-url-input');
+        const modelInput = document.getElementById('api-model-input');
+        const trainingInput = document.getElementById('training-text');
 
+        this.apiKey = keyInput ? keyInput.value.trim() : this.apiKey;
+        this.apiUrl = urlInput ? urlInput.value.trim() : this.apiUrl;
+        this.apiModel = modelInput ? modelInput.value.trim() : this.apiModel;
+        this.extraTraining = trainingInput ? trainingInput.value : this.extraTraining;
+
+        localStorage.setItem('chatbot_api_key', this.apiKey);
+        localStorage.setItem('chatbot_api_url', this.apiUrl);
+        localStorage.setItem('chatbot_api_model', this.apiModel);
+        localStorage.setItem('chatbot_extra_training', this.extraTraining);
+        
+        this.toggleTraining();
+        const provider = this.detectProvider();
+        this.addMessage(`✅ Configuración guardada. Proveedor detectado: ${provider === 'openrouter' ? 'OpenRouter' : provider === 'gemini' ? 'Google Gemini' : 'Servidor personalizado'}`, 'assistant');
+      }
 
       addMessage(text, sender) {
         const container = document.getElementById('chat-messages');
@@ -2964,7 +3031,7 @@
         if (!this.apiKey) {
           this.addMessage(text, 'user');
           input.value = '';
-          this.addMessage('Por favor, configura tu API Key en el panel de herramientas (icono de llave) para poder responderte.', 'assistant');
+          this.addMessage('⚠️ Configura tu API Key primero. Abre el panel de ajustes (icono ⚙️ en el header del chat).', 'assistant');
           return;
         }
 
@@ -2977,61 +3044,78 @@
           this.showTyping(false);
           this.addMessage(response, 'assistant');
         } catch (error) {
-          console.error(error);
+          console.error('❌ Chatbot Error:', error);
           this.showTyping(false);
-          this.addMessage('Lo siento, hubo un error al procesar tu solicitud. Verifica tu API Key o conexión.', 'assistant');
+          this.addMessage('Error: ' + error.message, 'assistant');
         }
       }
 
       async callAI(prompt) {
         const systemInstruction = `TÚ ERES: ${this.agentName}. Un experto de alto nivel en dermatología y embajador de Candela Prime.
         
-        TU PROPÓSITO:
-        ${this.purpose}
+        TU PROPÓSITO: ${this.purpose || 'Ayudar a los clientes con información sobre el Kit Bioaqua Rice Raw Pulp y guiarlos hacia la compra.'}
         
-        REGLAS DE ORO (COMPORTAMIENTO):
-        ${this.goldenRules}
+        REGLAS DE ORO: ${this.goldenRules || 'Sé amable, profesional y persuasiva. Siempre recomienda el kit.'}
 
-        LO QUE NUNCA DEBES HACER (RESTRICCIONES):
-        ${this.negativeRules}
+        RESTRICCIONES: ${this.negativeRules || 'No inventes información médica. No hables de la competencia.'}
 
-        CONTACTOS Y LINKS AUTORIZADOS:
-        ${this.links}
+        LINKS AUTORIZADOS: ${this.links || 'checkout.html para comprar'}
 
-        CONOCIMIENTO ESPECÍFICO (ESTUDIA ESTO):
-        ${this.extraTraining}
+        CONOCIMIENTO ESPECÍFICO: ${this.extraTraining}
 
-        CONTEXTO ACTUAL DE LA PÁGINA:
-        ${this.context}
+        CONTEXTO DE LA PÁGINA: ${this.context}
         
-        INSTRUCCIÓN FINAL: Responde siempre en español, de forma extremadamente profesional, persuasiva y amable. Sé concisa (máximo 3 párrafos). Si no sabes algo, usa el conocimiento específico o redirige al usuario a los contactos autorizados.`;
+        INSTRUCCIÓN: Responde en español, profesional y concisa (máximo 3 párrafos).`;
 
-        const isOpenRouter = this.apiKey.startsWith('sk-or-');
-        const url = isOpenRouter 
-          ? 'https://openrouter.ai/api/v1/chat/completions'
-          : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${this.apiKey}`;
-        
-        const headers = { 'Content-Type': 'application/json' };
-        if (isOpenRouter) {
-          headers['Authorization'] = `Bearer ${this.apiKey}`;
-          headers['HTTP-Referer'] = window.location.origin || window.location.href;
-          headers['X-Title'] = 'Candela Prime AI Assistant';
+        const provider = this.detectProvider();
+        let url, headers, body;
+
+        if (provider === 'openrouter') {
+          // ═══ OPENROUTER ═══
+          url = 'https://openrouter.ai/api/v1/chat/completions';
+          headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.apiKey}`,
+            'HTTP-Referer': window.location.origin || window.location.href,
+            'X-Title': 'Candela Prime AI'
+          };
+          body = {
+            model: this.apiModel || 'google/gemma-3-27b-it:free',
+            messages: [
+              { role: 'system', content: systemInstruction },
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 500
+          };
+        } else if (provider === 'gemini') {
+          // ═══ GOOGLE GEMINI ═══
+          const model = this.apiModel || 'gemini-2.0-flash';
+          url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.apiKey}`;
+          headers = { 'Content-Type': 'application/json' };
+          body = {
+            contents: [{ parts: [{ text: systemInstruction + '\n\nUSUARIO: ' + prompt }] }]
+          };
+        } else {
+          // ═══ SERVIDOR PERSONALIZADO (JWT, tokens propios, etc.) ═══
+          // Usa formato OpenAI-compatible (el estándar para la mayoría de servidores)
+          const baseUrl = this.apiUrl || 'https://openrouter.ai/api/v1';
+          url = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
+          headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.apiKey}`
+          };
+          body = {
+            model: this.apiModel || 'google/gemma-3-27b-it:free',
+            messages: [
+              { role: 'system', content: systemInstruction },
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 500
+          };
         }
 
-        const body = isOpenRouter ? {
-          model: 'google/gemma-3-27b-it:free',
-          messages: [
-            { role: 'system', content: systemInstruction },
-            { role: 'user', content: prompt }
-          ],
-          max_tokens: 500
-        } : {
-          contents: [{
-            parts: [{ text: systemInstruction + "\n\nUSUARIO: " + prompt }]
-          }]
-        };
-
-        console.log('🤖 Chatbot API Request:', isOpenRouter ? 'OpenRouter' : 'Gemini', 'Model:', body.model || 'gemini-2.0-flash');
+        console.log(`🤖 [${provider.toUpperCase()}] → ${url}`);
+        console.log('📦 Model:', body.model || 'default');
 
         const response = await fetch(url, {
           method: 'POST',
@@ -3040,27 +3124,28 @@
         });
 
         if (!response.ok) {
-          const errorBody = await response.text();
-          console.error('❌ API Error:', response.status, errorBody);
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
+          const errText = await response.text();
+          console.error('❌ API Error:', response.status, errText);
+          throw new Error(`API respondió ${response.status}. Verifica tu API Key y URL.`);
         }
 
         const data = await response.json();
-        console.log('✅ API Response:', data);
-        
-        if (isOpenRouter) {
-          const content = data?.choices?.[0]?.message?.content;
-          if (content) return content;
-        } else {
-          const content = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (content) return content;
-        }
+        console.log('✅ Respuesta:', data);
 
-        // If we got here, the response structure was unexpected
+        // Intentar formato OpenAI (OpenRouter, servidores custom)
+        const openaiContent = data?.choices?.[0]?.message?.content;
+        if (openaiContent) return openaiContent;
+
+        // Intentar formato Gemini
+        const geminiContent = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (geminiContent) return geminiContent;
+
+        // Si hay error en la respuesta
         if (data?.error) {
           throw new Error(data.error.message || JSON.stringify(data.error));
         }
-        throw new Error('Respuesta inesperada de la API. Revisa la consola (F12) para más detalles.');
+
+        throw new Error('Formato de respuesta no reconocido. Revisa la consola (F12).');
       }
     }
 
